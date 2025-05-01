@@ -1,18 +1,18 @@
 import { useState, useEffect } from "react";
 
-export const usePizzaOfTheDay = () => {
-  const [pizzaOfTheDay, setPizzaOfTheDay] = useState(null);
-
-
-  useEffect(() => {
+export default function usePizzaOfTheDay() {
+    const [pizzaOfTheDay, setPizzaOfTheDay] = useState(null);
+    
     async function fetchPizzaOfTheDay() {
       const response = await fetch("/api/pizza-of-the-day");
       const data = await response.json();
       setPizzaOfTheDay(data);
     }
 
-    fetchPizzaOfTheDay();
-  }, []);
+    useEffect(() => {
+        fetchPizzaOfTheDay();
+    }, []);
 
-  return pizzaOfTheDay;
-};
+    return pizzaOfTheDay;
+        
+}

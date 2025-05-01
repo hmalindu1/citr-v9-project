@@ -19,9 +19,12 @@ export default function Order() {
 
   if (!loading) {
     selectedPizza = pizzaTypes.find((pizza) => pizzaType === pizza.id);
+    prize = intl.format(selectedPizza?.sizes[pizzaSize]);
   }
 
   async function fetchPizzaTypes() {
+    // await new Promise((resolve) => setTimeout(resolve, 10000));
+
     const pizzaResponse = await fetch("/api/pizzas");
     const pizzaJson = await pizzaResponse.json();
     setPizzaTypes(pizzaJson);
@@ -49,7 +52,7 @@ export default function Order() {
               name="pizza-type"
               value={pizzaType}
             >
-              {pizzaTypes.map((pizza) => { 
+              {pizzaTypes.map((pizza) => {
                 return (
                   <option key={pizza.id} value={pizza.id}>
                     {pizza.name}
@@ -68,7 +71,7 @@ export default function Order() {
                   name="pizza-size"
                   value="S"
                   id="pizza-s"
-                  onClick={handlePizzaSizeChange}
+                  onChange={handlePizzaSizeChange}
                 />
                 <label htmlFor="pizza-s">Small</label>
               </span>
@@ -79,7 +82,7 @@ export default function Order() {
                   name="pizza-size"
                   value="M"
                   id="pizza-m"
-                  onClick={handlePizzaSizeChange}
+                  onChange={handlePizzaSizeChange}
                 />
                 <label htmlFor="pizza-m">Medium</label>
               </span>
@@ -90,7 +93,7 @@ export default function Order() {
                   name="pizza-size"
                   value="L"
                   id="pizza-l"
-                  onClick={handlePizzaSizeChange}
+                  onChange={handlePizzaSizeChange}
                 />
                 <label htmlFor="pizza-l">Large</label>
               </span>
@@ -99,12 +102,16 @@ export default function Order() {
           <button type="submit">Add to Cart</button>
         </div>
         <div className="order-pizza">
-          <Pizza
-            name="Pepperoni"
-            description="Mozzarella Cheese, Pepperoni"
-            image="/public/pizzas/pepperoni.webp"
-          />
-          <p>$13.37</p>
+          {loading ? (
+            <h1> Loading .... </h1>
+          ) : (
+            <Pizza
+              name={selectedPizza?.name}
+              description={selectedPizza?.description}
+              image={selectedPizza?.image}
+            />
+          )}
+          <p>{prize}</p>
         </div>
       </form>
     </div>
