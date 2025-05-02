@@ -1,9 +1,9 @@
 import usePizzaOfTheDay from "./usePizzaOfTheDay";
 
 // feel free to change en-US / USD to your locale
-const intl = new Intl.NumberFormat("en-US", {
+const intl = new Intl.NumberFormat("en-LK", {
   style: "currency",
-  currency: "USD",
+  currency: "LKR",
 });
 
 export default function PizzaOfTheDay () {

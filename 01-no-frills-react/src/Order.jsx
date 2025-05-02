@@ -1,5 +1,6 @@
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import Pizza from "./Pizza";
+import Cart from "./Cart";
 
 const intl = new Intl.NumberFormat("en-LK", {
   style: "currency",
@@ -13,7 +14,23 @@ export default function Order() {
   const [pizzaTypes, setPizzaTypes] = useState([]);
   const [pizzaType, setPizzaType] = useState("pepperoni");
   const [pizzaSize, setPizzaSize] = useState("M");
+  const [cart, setCart] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  async function checkout() {
+    setLoading(true);
+
+    await fetch("/api/order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({cart}),
+    })
+
+    setCart([]);
+    setLoading(false);
+  }
 
   let prize, selectedPizza;
 
@@ -39,81 +56,90 @@ export default function Order() {
     setPizzaSize(event.target.value);
   };
   return (
-    <div className="order">
-      <h2>Create Order</h2>
-      <form>
-        <div>
+    <div className="order-page">
+      <div className="order">
+        <h2>Create Order</h2>
+        <form
+          onSubmit={(event) => {
+            event.preventDefault();
+
+            setCart([...cart, { pizza: selectedPizza, size: pizzaSize, prize }]);
+          }}
+        >
           <div>
-            <label htmlFor="pizza-type">Pizza Type</label>
-            <select
-              onChange={(event) => {
-                setPizzaType(event.target.value);
-              }}
-              name="pizza-type"
-              value={pizzaType}
-            >
-              {pizzaTypes.map((pizza) => {
-                return (
-                  <option key={pizza.id} value={pizza.id}>
-                    {pizza.name}
-                  </option>
-                );
-              })}
-            </select>
-          </div>
-          <div>
-            <label htmlFor="pizza-size">Pizza Size</label>
             <div>
-              <span>
-                <input
-                  checked={pizzaSize === "S"}
-                  type="radio"
-                  name="pizza-size"
-                  value="S"
-                  id="pizza-s"
-                  onChange={handlePizzaSizeChange}
-                />
-                <label htmlFor="pizza-s">Small</label>
-              </span>
-              <span>
-                <input
-                  checked={pizzaSize === "M"}
-                  type="radio"
-                  name="pizza-size"
-                  value="M"
-                  id="pizza-m"
-                  onChange={handlePizzaSizeChange}
-                />
-                <label htmlFor="pizza-m">Medium</label>
-              </span>
-              <span>
-                <input
-                  checked={pizzaSize === "L"}
-                  type="radio"
-                  name="pizza-size"
-                  value="L"
-                  id="pizza-l"
-                  onChange={handlePizzaSizeChange}
-                />
-                <label htmlFor="pizza-l">Large</label>
-              </span>
+              <label htmlFor="pizza-type">Pizza Type</label>
+              <select
+                onChange={(event) => {
+                  setPizzaType(event.target.value);
+                }}
+                name="pizza-type"
+                value={pizzaType}
+              >
+                {pizzaTypes.map((pizza) => {
+                  return (
+                    <option key={pizza.id} value={pizza.id}>
+                      {pizza.name}
+                    </option>
+                  );
+                })}
+              </select>
             </div>
+            <div>
+              <label htmlFor="pizza-size">Pizza Size</label>
+              <div>
+                <span>
+                  <input
+                    checked={pizzaSize === "S"}
+                    type="radio"
+                    name="pizza-size"
+                    value="S"
+                    id="pizza-s"
+                    onChange={handlePizzaSizeChange}
+                  />
+                  <label htmlFor="pizza-s">Small</label>
+                </span>
+                <span>
+                  <input
+                    checked={pizzaSize === "M"}
+                    type="radio"
+                    name="pizza-size"
+                    value="M"
+                    id="pizza-m"
+                    onChange={handlePizzaSizeChange}
+                  />
+                  <label htmlFor="pizza-m">Medium</label>
+                </span>
+                <span>
+                  <input
+                    checked={pizzaSize === "L"}
+                    type="radio"
+                    name="pizza-size"
+                    value="L"
+                    id="pizza-l"
+                    onChange={handlePizzaSizeChange}
+                  />
+                  <label htmlFor="pizza-l">Large</label>
+                </span>
+              </div>
+            </div>
+            <button type="submit">Add to Cart</button>
           </div>
-          <button type="submit">Add to Cart</button>
-        </div>
-        <div className="order-pizza">
           {loading ? (
-            <h1> Loading .... </h1>
+            <h3>LOADING …</h3>
           ) : (
-            <Pizza
-              name={selectedPizza?.name}
-              description={selectedPizza?.description}
-              image={selectedPizza?.image}
-            />
+            <div className="order-pizza">
+              <Pizza
+                name={selectedPizza.name}
+                description={selectedPizza.description}
+                image={selectedPizza.image}
+              />
+              <p>{prize}</p>
+            </div>
           )}
-          <p>{prize}</p>
-        </div>
-      </form>
+        </form>
+      </div>
+      {loading ? " LOADING..." : <Cart cart={cart} checkout={checkout}/>}
     </div>
   );
 }
